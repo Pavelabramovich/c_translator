@@ -1,0 +1,16 @@
+E:\NewRepos\Trans2\bin\Debug\net8.0-windows\Trans2.exe
+E:\NewRepos\Trans2\bin\Debug\net8.0-windows\Trans2.deps.json
+E:\NewRepos\Trans2\bin\Debug\net8.0-windows\Trans2.runtimeconfig.json
+E:\NewRepos\Trans2\bin\Debug\net8.0-windows\Trans2.dll
+E:\NewRepos\Trans2\bin\Debug\net8.0-windows\Trans2.pdb
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.Form1.resources
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.csproj.GenerateResource.cache
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.GeneratedMSBuildEditorConfig.editorconfig
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.AssemblyInfoInputs.cache
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.AssemblyInfo.cs
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.csproj.CoreCompileInputs.cache
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.dll
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\refint\Trans2.dll
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.pdb
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.genruntimeconfig.cache
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\ref\Trans2.dll
