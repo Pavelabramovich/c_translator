@@ -8,12 +8,12 @@ struct B
 	struct A * a;
 };
 
-int func(int* d, double d)
+int func(int* d, double a)
 {
 	return 0;
 }
 
-void main()
+int main()
 {
 	struct B b;
 
@@ -23,11 +23,14 @@ void main()
 	int i;
 	i = *ptr;
 
+	int i = 3;
+
 	int res = func(ptr, 10 + 12 / 2 / 3 / 4 + 3 /3);
 	int d, o = (7 + 1) * 5, m = (int)8.3;
 
 	if (d)
 	{
+		int i = 8;
 		long int * t = ptr;
 	}
 	else if (2)

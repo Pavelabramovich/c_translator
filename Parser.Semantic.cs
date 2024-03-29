@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 using static Trans.Parser;
 
 
@@ -81,10 +82,10 @@ public static partial class Parser
 
     private static void CheckVariableUsageSemantic(Node root)
     {
-        CheckVariableUsageSemantic(root, [], []);
+        CheckVariableUsageSemantic(root, new ScopeInfo() { Root = root });
 
 
-        static void CheckVariableUsageSemantic(Node root, Dictionary<int, IdentifierInfo> identifiersTypes, List<StructInfo> structs)
+        static void CheckVariableUsageSemantic(Node root, ScopeInfo scope)
         {
             if (root is OperatorNode operatorNode)
             {
@@ -97,43 +98,86 @@ public static partial class Parser
 
                     Node @params = operatorNode.Children.ToArray()[2];
 
+                    var allParamsScope = new ScopeInfo() { Structs = scope.AncestorsStructs };
+
                     IEnumerable<IdentifierInfo> paramsInfo = ((OperatorNode)@params).Children.Select(p =>
                     {
-                        var paramsDict = new Dictionary<int, IdentifierInfo>();
+                        var paramsScope = new ScopeInfo() { Structs = scope.AncestorsStructs };
 
-                        CheckVariableUsageSemantic(p, paramsDict, structs);
+                        CheckVariableUsageSemantic(p, paramsScope);
+                        CheckVariableUsageSemantic(p, allParamsScope);
 
-                        return paramsDict.Values.First();
+                        return paramsScope.Identifiers.Values.First();
                     });
 
-                    identifiersTypes[funcName.Id] = new FuncInfo { Token = funcName, Type = new TypeInfo(type, structs), argsInfo = paramsInfo.ToList() };
-
-                    var identifiersTypesWithParams = new Dictionary<int, IdentifierInfo>(identifiersTypes);
-                    CheckVariableUsageSemantic(@params, identifiersTypesWithParams, structs);
+                    if (scope.Identifiers.TryGetValue(funcName.Id, out IdentifierInfo? info))
+                    {
+                        if (info is FuncInfo funcInfo)
+                        {
+                            if (funcInfo.Value is not null)
+                                throw new SemanticException($"This function already defined.");
+                        }
+                        else
+                        {
+                            throw new SemanticException($"Function replaced by variable");
+                        }
+                    }
 
                     Node body = operatorNode.Children.ToArray()[3];
 
-                    CheckVariableUsageSemantic(body, identifiersTypesWithParams, structs);
+                    scope.Identifiers[funcName.Id] = new FuncInfo 
+                    { 
+                        Token = funcName, 
+                        Type = new TypeInfo(type, scope.AncestorsStructs), 
+                        argsInfo = paramsInfo.ToList(),
+                        Value = body
+                    };
+
+                    //var identifiersTypesWithParams = new Dictionary<int, IdentifierInfo>(identifiersTypes);
+                    var paramsScope = new ScopeInfo() { ParentScope = scope };
+
+                    CheckVariableUsageSemantic(@params, paramsScope);
+
+                    
+                    paramsScope.Root = operatorNode;
+
+                    CheckVariableUsageSemantic(body, paramsScope);
                 }
                 else if (@operator == "Function prototype")
                 {
                     Node type = operatorNode.Children.ToArray()[0];
                     Token funcName = ((ValueNode)operatorNode.Children.ToArray()[1]).Token;
 
-                    identifiersTypes[funcName.Id] = new IdentifierInfo { Token = funcName, Type = new TypeInfo(type, structs) };
-
                     Node @params = operatorNode.Children.ToArray()[2];
 
                     IEnumerable<IdentifierInfo> paramsInfo = ((OperatorNode)@params).Children.Select(p =>
                     {
-                        var paramsDict = new Dictionary<int, IdentifierInfo>();
+                        var paramsScope = new ScopeInfo() { Structs = scope.AncestorsStructs };
 
-                        CheckVariableUsageSemantic(p, paramsDict, structs);
+                        CheckVariableUsageSemantic(p, paramsScope);
 
-                        return paramsDict.Values.First();
+                        return paramsScope.Identifiers.Values.First();
                     });
 
-                    identifiersTypes[funcName.Id] = new FuncInfo { Token = funcName, Type = new TypeInfo(type, structs), argsInfo = paramsInfo.ToList() };
+                    if (scope.Identifiers.TryGetValue(funcName.Id, out IdentifierInfo? info))
+                    {
+                        if (info is FuncInfo funcInfo)
+                        {
+                            if (funcInfo.Value is not null)
+                                throw new SemanticException($"This function already defined.");
+                        }
+                        else
+                        {
+                            throw new SemanticException($"Function replaced by variable");
+                        }
+                    }
+
+                    scope.Identifiers[funcName.Id] = new FuncInfo 
+                    { 
+                        Token = funcName, 
+                        Type = new TypeInfo(type, scope.AncestorsStructs), 
+                        argsInfo = paramsInfo.ToList() 
+                    };
                 }
                 else if (@operator == "Struct declaration")
                 {
@@ -163,14 +207,18 @@ public static partial class Parser
                                 }
 
                                 string name = ((ValueNode)nameNode).Token.Value;
-                                TypeInfo typeInfo = new TypeInfo(typeNode, structs);
+                                TypeInfo typeInfo = new TypeInfo(typeNode, scope.AncestorsStructs);
 
                                 return KeyValuePair.Create(name, typeInfo);
                             })
                             .ToDictionary();
 
                         var structInfo = new StructInfo() { Pointed = fieldTypes, Name = token.Value };
-                        structs.Add(structInfo);
+
+                        if (scope.AncestorsStructs.Any(s => s.Name == structInfo.Name))
+                            throw new SemanticException("Struct already defined.");
+
+                        scope.Structs.Add(structInfo);
                     }
                     catch (Exception e)
                     {
@@ -180,20 +228,27 @@ public static partial class Parser
                 else if (@operator == "Variable initialization")
                 {
                     var initValue = operatorNode.Children.ToArray()[1];
-                    //CheckVariableUsageSemantic(initValue, identifiersTypes, structs); 
 
-                    var initValueType = GetRValueType(initValue, identifiersTypes, structs);
+                    var initValueType = GetRValueType(initValue, scope);
 
                     var declarationNode = (OperatorNode)operatorNode.Children.ToArray()[0];
 
                     Node type = declarationNode.Children.ToArray()[0];
                     Token token = ((ValueNode)declarationNode.Children.ToArray()[1]).Token;
 
-                    var varType = new TypeInfo(type, structs);
+                    var varType = new TypeInfo(type, scope.AncestorsStructs);
 
                     TypeInfo.CanImplicitCasted(initValueType, varType);
 
-                    identifiersTypes[token.Id] = new IdentifierInfo { Token = token, Type = varType, Value = initValue };
+                    if (scope.Identifiers.ContainsKey(token.Id))
+                        throw new SemanticException($"Variable {token.Value} already defined.");
+
+                    scope.Identifiers[token.Id] = new IdentifierInfo 
+                    { 
+                        Token = token, 
+                        Type = varType, 
+                        Value = initValue 
+                    };
                 }
                 else if (@operator == "Variable declaration")
                 {
@@ -206,29 +261,38 @@ public static partial class Parser
                     }
                     else if (type is TypesNode tokenNode)
                     {
-                        var typeInfo = new TypeInfo(type, structs);
+                        var typeInfo = new TypeInfo(type, scope.AncestorsStructs);
 
                         if (typeInfo.TypesParts.Contains("const") || typeInfo.TypesParts.Contains("*const"))
                             throw new SemanticException($"Const variable not initialized.");
                     }
 
-                    identifiersTypes[token.Id] = new IdentifierInfo { Token = token, Type = new TypeInfo(type, structs) };
+                    if (scope.Identifiers.ContainsKey(token.Id))
+                        throw new SemanticException($"Variable {token.Value} already defined.");
+
+                    scope.Identifiers[token.Id] = new IdentifierInfo 
+                    { 
+                        Token = token, 
+                        Type = new TypeInfo(type, scope.AncestorsStructs) 
+                    };
                 }
                 else if (@operator is "If else if statements" or "If else if else statements")
                 {
                     foreach (Node childNode in operatorNode.Children)
                     {
-                        CheckVariableUsageSemantic(childNode, identifiersTypes, structs);
+                        CheckVariableUsageSemantic(childNode, scope);
                     }
                 }
                 else if (@operator is "If statement" or "Else if statement")
                 {
-                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], new Dictionary<int, IdentifierInfo>(identifiersTypes), structs);
-                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[1], new Dictionary<int, IdentifierInfo>(identifiersTypes), structs);
+                    var ifScope = new ScopeInfo() { ParentScope = scope, Root = operatorNode };
+
+                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], ifScope);
+                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[1], ifScope);
                 }
                 else if (@operator == "Else statement")
                 {
-                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], new Dictionary<int, IdentifierInfo>(identifiersTypes), structs);
+                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], new ScopeInfo() { ParentScope = scope, Root = operatorNode });
                 }
                 else if (@operator == "For loop")
                 {
@@ -237,50 +301,54 @@ public static partial class Parser
                     Node iteratorIncrementNode = operatorNode.Children.ToArray()[2];
                     Node blockNode = operatorNode.Children.ToArray()[3];
 
-                    var identifiersTypesWithIterator = new Dictionary<int, IdentifierInfo>(identifiersTypes);
-                    CheckVariableUsageSemantic(iteratorInitializationNode, identifiersTypesWithIterator, structs);
-                    CheckVariableUsageSemantic(conditionNode, identifiersTypesWithIterator, structs);
-                    CheckVariableUsageSemantic(iteratorIncrementNode, identifiersTypesWithIterator, structs);
-                    CheckVariableUsageSemantic(blockNode, identifiersTypesWithIterator, structs);
+                    // var identifiersTypesWithIterator = new Dictionary<int, IdentifierInfo>(identifiersTypes);
+                    var forScope = new ScopeInfo() { ParentScope = scope, Root = operatorNode };
+
+                    CheckVariableUsageSemantic(iteratorInitializationNode, forScope);
+                    CheckVariableUsageSemantic(conditionNode, forScope);
+                    CheckVariableUsageSemantic(iteratorIncrementNode, forScope);
+                    CheckVariableUsageSemantic(blockNode, forScope);
                 }
                 else if (@operator is "While loop" or "Do while loop")
                 {
-                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], new Dictionary<int, IdentifierInfo>(identifiersTypes), structs);
-                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[1], new Dictionary<int, IdentifierInfo>(identifiersTypes), structs);
+                    var whileScipe = new ScopeInfo() { ParentScope = scope, Root = operatorNode };
+
+                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[0], whileScipe);
+                    CheckVariableUsageSemantic(operatorNode.Children.ToArray()[1], whileScipe);
                 }
-                else if (new[] { "=", "+=", "-=", "*=", "/=", "%=", ">>=", "<<=", "|=", "&=", "^=" }.Contains(@operator))
+                else if (@operator == "Return")
                 {
-                    Node var = operatorNode.Children.ToArray()[0];
-                    Node expr = operatorNode.Children.ToArray()[1];
+                    TypeInfo funcType = scope.IfFunc
+                        ?? throw new SemanticException("Can't use return in not function object.");
 
-                    var token = ((ValueNode)var).Token;
-
-                    if (!identifiersTypes.TryGetValue(token.Id, out IdentifierInfo? info))
+                    if (funcType.TypesParts is ["void"])
                     {
-                        throw new SemanticException($"Variable {token.Value} is no defined.");
+                        if (operatorNode.Children.Any())
+                            throw new SemanticException("Return type of this function is void. It can't return value.");
                     }
+                    else
+                    {
+                        if (operatorNode.Children.Count() == 0)
+                            throw new SemanticException("Return type of this function is not void. It should return value.");
 
-                    var type1 = GetRValueType(var, identifiersTypes, structs);
-                    var type2 = GetRValueType(expr, identifiersTypes, structs);
+                        TypeInfo returnType = GetRValueType(operatorNode.Children.ToArray()[0], scope);
 
-                    TypeInfo.CanImplicitCasted(type2, type1);
-
-                    var identifiersTypesWithIterator = new Dictionary<int, IdentifierInfo>(identifiersTypes);
-                    CheckVariableUsageSemantic(var, identifiersTypesWithIterator, structs);
-                    CheckVariableUsageSemantic(expr, identifiersTypesWithIterator, structs);
+                        if (!TypeInfo.IsImplicitCasted(returnType, funcType))
+                            throw new SemanticException("Invalid return type of function.");
+                    }
                 }
                 else
                 {
                     try
                     {
-                        _ = GetRValueType(operatorNode, identifiersTypes, structs);
+                        _ = GetRValueType(operatorNode, scope);
                     }
                     catch (SemanticException ex) when (ex.Message == "Invalid semantic")
-                    { }
-
-                    foreach (var childNode in operatorNode.Children)
                     {
-                        CheckVariableUsageSemantic(childNode, identifiersTypes, structs);
+                        foreach (var childNode in operatorNode.Children)
+                        {
+                            CheckVariableUsageSemantic(childNode, scope);
+                        }
                     }
                 }
             }
@@ -290,8 +358,13 @@ public static partial class Parser
                 {
                     int id = valueNode.Token.Id;
 
-                    if (!identifiersTypes.ContainsKey(id))
+                    if (!scope.AncestorsIdentifiers.ContainsKey(id))
                         throw new SemanticException($"Indentifier {valueNode.Token.Value} used without declaration.");
+                }
+                else if (valueNode.Token.TokenType == TokenType.KeyWord)
+                {
+                    if (!scope.IsLoop)
+                        throw new SemanticException($"Invalid {valueNode.Token.Value} usage: it can be used only in loops.");
                 }
             }
             else
@@ -300,23 +373,15 @@ public static partial class Parser
             }
         }
 
-        static TypeInfo GetLValueType(Node root, Dictionary<int, IdentifierInfo> identifierInfo, List<StructInfo> structs)
+        static TypeInfo GetLValueType(Node root, ScopeInfo scope)
         {
-            //if (root is OperatorNode { Operator: "(..)" } brecketsNode)
-            //{
-            //    var inner = brecketsNode.Children.ToArray()[0];
-            //    TypeInfo innerTypeInfo = GetRValueType(inner, identifierInfo, structs);
-
-            //    return innerTypeInfo;
-            //}
-            //else 
             if (root is OperatorNode { Operator: "Indexer [..]" } indexNode)
             { 
                 var left = indexNode.Children.ToArray()[0];
                 var right = indexNode.Children.ToArray()[1];
 
-                TypeInfo leftTypeInfo = GetLValueType(left, identifierInfo, structs);
-                TypeInfo rightTypeInfo = GetRValueType(right, identifierInfo, structs);
+                TypeInfo leftTypeInfo = GetLValueType(left, scope);
+                TypeInfo rightTypeInfo = GetRValueType(right, scope);
 
                 if (leftTypeInfo.IfIndexed is null)
                     throw new SemanticException($"Not indexed type {string.Join(' ', leftTypeInfo.TypesParts)}.");
@@ -333,7 +398,7 @@ public static partial class Parser
 
                 var pointArg = ((ValueNode)right).Token.Value;
 
-                TypeInfo leftTypeInfo = GetRValueType(left, identifierInfo, structs);
+                TypeInfo leftTypeInfo = GetRValueType(left, scope);
 
                 if (leftTypeInfo.IfPointed is null)
                     throw new SemanticException($"Not pointable type: {string.Join(' ', leftTypeInfo.TypesParts)}.");
@@ -350,7 +415,7 @@ public static partial class Parser
 
                 var arrowArg = ((ValueNode)right).Token.Value;
 
-                TypeInfo leftTypeInfo = GetRValueType(left, identifierInfo, structs);
+                TypeInfo leftTypeInfo = GetRValueType(left, scope);
 
                 if (leftTypeInfo.IfArrowed is null)
                     throw new SemanticException($"Not arrowble type {string.Join(' ', leftTypeInfo.TypesParts)}.");
@@ -362,9 +427,9 @@ public static partial class Parser
             }
             else if (root is ValueNode valueNode && valueNode.Token.TokenType == TokenType.Identifier)
             {
-                if (identifierInfo.TryGetValue(valueNode.Token.Id, out IdentifierInfo? value))
+                if (scope.AncestorsIdentifiers.TryGetValue(valueNode.Token.Id, out IdentifierInfo? identifierInfo))
                 {
-                    return new TypeInfo(value.Type);
+                    return new TypeInfo(identifierInfo.Type);
                 }
                 else
                 {
@@ -375,9 +440,9 @@ public static partial class Parser
             {
                 var operand = addressOfOperator.Children.ToArray()[0];
 
-                var typeInfo = GetLValueType(operand, identifierInfo, structs);
+                var typeInfo = GetLValueType(operand, scope);
 
-                return new TypeInfo([.. typeInfo.TypesParts, "*"], structs);
+                return new TypeInfo([.. typeInfo.TypesParts, "*"], scope.AncestorsStructs);
             }
             else
             {
@@ -385,22 +450,22 @@ public static partial class Parser
             }
         }
 
-        static TypeInfo GetRValueType(Node root, Dictionary<int, IdentifierInfo> identifierInfo, List<StructInfo> structs)
+        static TypeInfo GetRValueType(Node root, ScopeInfo scope /*Dictionary<int, IdentifierInfo> identifierInfo, List<StructInfo> structs*/)
         {
             if (root is ValueNode valueNode && valueNode.Token.TokenType is LiteralType literal)
             {
                 if (literal.ToString().ToLower().Contains("string"))
-                    return new TypeInfo(["*", "char"], structs);
+                    return new TypeInfo(["*", "char"], scope.AncestorsStructs);
 
                 List<string> list = ["*", "const", "char", "long", "int", "short", "double", "float", "auto"];
 
-                return new TypeInfo(literal.ToString().ToLower().Split().Where(l => list.Contains(l)).ToList(), structs);
+                return new TypeInfo(literal.ToString().ToLower().Split().Where(l => list.Contains(l)).ToList(), scope.AncestorsStructs);
             }
             else if (root is OperatorNode { Operator: "Function calling" } funcOperator)
             {
                 var funcId = ((ValueNode)funcOperator.Children.ToArray()[0]).Token.Id;
 
-                if (!identifierInfo.TryGetValue(funcId, out IdentifierInfo? info))
+                if (!scope.AncestorsIdentifiers.TryGetValue(funcId, out IdentifierInfo? info))
                     throw new SemanticException("Func is not declared.");
 
                 if (info is not FuncInfo funcInfo)
@@ -413,7 +478,7 @@ public static partial class Parser
 
                 TypeInfo[] funcArgsTypes = funcArgs.Select(fa =>
                 {
-                    return GetRValueType(fa, new(identifierInfo), structs);
+                    return GetRValueType(fa, new ScopeInfo() { ParentScope = scope });
                 })
                 .ToArray();
 
@@ -432,11 +497,38 @@ public static partial class Parser
 
                 return funcInfo.Type;
             }
+            else if (root is OperatorNode assignmentNode 
+                    && new[] { "=", "+=", "-=", "*=", "/=", "%=", ">>=", "<<=", "|=", "&=", "^=" }.Contains(assignmentNode.Operator))
+            {
+                Node var = assignmentNode.Children.ToArray()[0];
+                Node expr = assignmentNode.Children.ToArray()[1];
+
+                var token = ((ValueNode)var).Token;
+
+                if (!scope.AncestorsIdentifiers.TryGetValue(token.Id, out IdentifierInfo? info))               
+                    throw new SemanticException($"Variable {token.Value} is no defined.");
+                
+                if (info is FuncInfo)
+                    throw new SemanticException($"Variable {token.Value} is function that not assigneble.");
+
+                if (info.Type.IsReadOnly)
+                    throw new SemanticException($"Variable {token.Value} is read only.");
+
+                var type1 = GetRValueType(var, scope);
+                var type2 = GetRValueType(expr, scope);
+
+                TypeInfo.CanImplicitCasted(type2, type1);
+
+                CheckVariableUsageSemantic(var, new ScopeInfo() { ParentScope = scope });
+                CheckVariableUsageSemantic(expr, new ScopeInfo() { ParentScope = scope });
+
+                return type1;
+            }
             else if (root is UnaryOperatorNode { Operator: "Indirection *" } starNode)
             {
                 var operand = starNode.Children.ToArray()[0];
 
-                var typeInfo = GetRValueType(operand, identifierInfo, structs);
+                var typeInfo = GetRValueType(operand, scope);
 
                 if (typeInfo.IfIndexed is null)
                     throw new SemanticException($"Invalid type of star operator: {string.Join(' ', typeInfo.TypesParts)}.");
@@ -451,8 +543,8 @@ public static partial class Parser
                 var left = operatorNode.Children.ToArray()[0];
                 var right = operatorNode.Children.ToArray()[1];
 
-                var leftInfo = GetRValueType(left, identifierInfo, structs);
-                var rightInfo = GetRValueType(right, identifierInfo, structs);
+                var leftInfo = GetRValueType(left, scope);
+                var rightInfo = GetRValueType(right, scope);
 
                 if (leftInfo.IfPointed is not null || rightInfo.IfPointed is not null)
                 {
@@ -501,8 +593,8 @@ public static partial class Parser
                 var left = oNode.Children.ToArray()[0];
                 var right = oNode.Children.ToArray()[1];
 
-                var leftInfo = GetRValueType(left, identifierInfo, structs);
-                var rightInfo = GetRValueType(right, identifierInfo, structs);
+                var leftInfo = GetRValueType(left, scope);
+                var rightInfo = GetRValueType(right, scope);
 
                 if (leftInfo.IfPointed is not null || rightInfo.IfPointed is not null)
                 {
@@ -514,7 +606,7 @@ public static partial class Parser
                 }
                 else
                 {
-                    return new TypeInfo(["char"], structs);
+                    return new TypeInfo(["char"], scope.AncestorsStructs);
                 }
             }
             else if (root is OperatorNode binNode && new string[] { "<<", ">>", "|", "||", "&&", "&", "^" }
@@ -523,8 +615,8 @@ public static partial class Parser
                 var left = binNode.Children.ToArray()[0];
                 var right = binNode.Children.ToArray()[1];
 
-                var leftInfo = GetRValueType(left, identifierInfo, structs);
-                var rightInfo = GetRValueType(right, identifierInfo, structs);
+                var leftInfo = GetRValueType(left, scope);
+                var rightInfo = GetRValueType(right, scope);
 
                 if (leftInfo.IfPointed is not null || rightInfo.IfPointed is not null)
                 {
@@ -552,7 +644,7 @@ public static partial class Parser
             {
                 var operand = unaryNode.Children.ToArray()[0];
 
-                var typeInfo = GetRValueType(operand, identifierInfo, structs);
+                var typeInfo = GetRValueType(operand, scope);
 
                 if (typeInfo.TypesParts.Contains("struct"))
                     throw new SemanticException($"Struct with {unaryNode.Operator.ToLower()}.");
@@ -563,36 +655,24 @@ public static partial class Parser
             {
                 var operand = bracketsNode.Children.ToArray()[0];
 
-                return GetRValueType(operand, identifierInfo, structs);
+                return GetRValueType(operand, scope);
             }
             else if (root is OperatorNode { Operator: "Type cast" } typeCastNode)
             {
                 var type = typeCastNode.Children.ToArray()[0];
                 var expr = typeCastNode.Children.ToArray()[1];
 
-                var typeInfo1 = new TypeInfo(type, structs);
-                var typeInfo2 = GetRValueType(expr, identifierInfo, structs);
+                var typeInfo1 = new TypeInfo(type, scope.AncestorsStructs);
+                var typeInfo2 = GetRValueType(expr, scope);
 
                 if (typeInfo2.TypesParts.Contains("string"))
                     throw new SemanticException("Invalid cast to string.");
 
                 return typeInfo1;
             }
-
-
-            //else if (root is OperatorNode operatorNode)
-            //{
-            //    var left = operatorNode.Children.ToArray()[0];
-
-            //    return identifierInfo[((ValueNode)left).Token.Id].Type;
-            //}
-
-
-
-
             else
             {
-                return GetLValueType(root, identifierInfo, structs);
+                return GetLValueType(root, scope);
             }
         }
     }
@@ -609,6 +689,7 @@ public static partial class Parser
         public List<IdentifierInfo> argsInfo { get; set; }
     }
 
+
     public class TypeInfo
     {
         public List<string> TypesParts;
@@ -617,7 +698,7 @@ public static partial class Parser
         { 
             get
             {
-                return TypesParts[0] is "const" or "*const";
+                return TypesParts.Contains("const") || TypesParts.Contains("*const");
             }
         }
 
@@ -864,8 +945,6 @@ public static partial class Parser
                 newTypesParts.RemoveAll(s => s == "*const");
 
                 AnaliseType(newTypesParts, structs);
-
-                //_ifPointed = null;
             }
             else if (typeParts.Contains("struct"))
             {
@@ -1043,7 +1122,7 @@ public static partial class Parser
                 }
                 else
                 {
-                    throw new NotImplementedException("Const not implemented");
+                    throw new Exception("???");
                 }
             }
             else
@@ -1062,8 +1141,11 @@ public static partial class Parser
         public Dictionary<string, TypeInfo>? Pointed { get; set; }
     }
 
+
     public class ScopeInfo
     {
+        public Node? Root { get; set; }
+
         public ScopeInfo? ParentScope { get; set; } = null;
 
         public List<StructInfo> Structs { get; set; } = [];
@@ -1077,10 +1159,15 @@ public static partial class Parser
             {
                 List<StructInfo> ans = [];
 
-                for (var scope = this; scope.ParentScope is not null; scope = scope.ParentScope)
+                var scope = this;
+
+                do
                 {
                     ans.AddRange(scope.Structs);
+
+                    scope = scope.ParentScope;
                 }
+                while (scope is not null);
 
                 return ans;
             }
@@ -1092,7 +1179,9 @@ public static partial class Parser
             {
                 Dictionary<int, IdentifierInfo> res = [];
 
-                for (var scope = this; scope.ParentScope is not null; scope = scope.ParentScope)
+                var scope = this;
+
+                do
                 {
                     scope.Identifiers.ToList().ForEach(x =>
                     {
@@ -1103,9 +1192,61 @@ public static partial class Parser
                         catch (ArgumentException)
                         { }
                     });
+
+                    scope = scope.ParentScope;
                 }
+                while (scope is not null);
 
                 return res;
+            }
+        }
+
+
+        public bool IsLoop
+        {
+            get
+            {
+                var scope = this;
+
+                do
+                {
+                    if (scope.Root is OperatorNode { Operator: "For loop" or "While loop" or "Do while loop" })
+                        return true;
+
+                    scope = scope.ParentScope;
+                }
+                while (scope is not null);
+
+                return false;
+            }
+        }
+
+        public TypeInfo? IfFunc
+        {
+            get
+            {
+                var scope = this;
+
+                do
+                {
+                    if (scope.Root is OperatorNode { Operator: "Function declaration" } funcNode)
+                    {
+                        Token funcToken = ((ValueNode)funcNode.Children.ToArray()[1]).Token;
+
+                        if (!AncestorsIdentifiers.TryGetValue(funcToken.Id, out IdentifierInfo? info))
+                            throw new SemanticException("Function is not declared.");
+
+                        if (info is not FuncInfo funcInfo)
+                            throw new SemanticException("Function is replaced by variable.");
+
+                        return funcInfo.Type;
+                    }
+
+                    scope = scope.ParentScope;
+                }
+                while (scope is not null);
+
+                return null;
             }
         }
     }
@@ -1120,24 +1261,6 @@ public static partial class Parser
             MessageBoxIcon.Information,
             MessageBoxDefaultButton.Button1,
             MessageBoxOptions.DefaultDesktopOnly);
-    }
-
-    private static bool IsNotThrow<TException>(Action action) where TException : Exception
-    {
-        try
-        {
-            action.Invoke();
-            return true;
-        }
-        catch (TException)
-        {
-            return false;
-        }
-    }
-
-    private static bool IsNotThrow(Action action)
-    {
-        return IsNotThrow<Exception>(action);
     }
 }
 

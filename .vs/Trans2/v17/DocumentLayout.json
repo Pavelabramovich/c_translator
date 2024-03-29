@@ -3,26 +3,26 @@
   "WorkspaceRootPath": "E:\\NewRepos\\Trans2\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\tst.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:tst.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|e:\\newrepos\\trans2\\parser.semantic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:parser.semantic.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|e:\\newrepos\\trans2\\tst.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:tst.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\parser.tokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:parser.tokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\HP\\AppData\\Local\\Temp\\.vsdbgsrc\\cb615b6b39ce7f56206f1a889a3947e49b935375a5497fd7d8c642df55c60776\\Enumerable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\HP\\AppData\\Local\\SourceServer\\4ad5c695d1991d4ee397b8edf7c9b2bd1c555b347b1419b909af31a5b50812cd\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\List.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\HP\\AppData\\Local\\SourceServer\\35d53eefb2dd5b8c2546b6d99c92b25c9c21958c68506f9661bd2584160a55e4\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\Dictionary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\parser.tokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|solutionrelative:parser.tokens.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D011118D-B339-4561-847C-F351079F6564}|Trans2.csproj|E:\\NewRepos\\Trans2\\parser.grammars.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -78,7 +78,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -94,33 +94,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Parser.Semantic.cs",
               "DocumentMoniker": "E:\\NewRepos\\Trans2\\Parser.Semantic.cs",
               "RelativeDocumentMoniker": "Parser.Semantic.cs",
               "ToolTip": "E:\\NewRepos\\Trans2\\Parser.Semantic.cs",
               "RelativeToolTip": "Parser.Semantic.cs",
-              "ViewState": "AQIAAM8DAAAAAAAAAAAAAFIEAAAAAAAA",
+              "ViewState": "AQIAADwAAAAAAAAAAAAwwFcAAABJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-29T11:07:50.68Z",
+              "WhenOpened": "2024-03-29T13:42:56.907Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "tst.txt",
               "DocumentMoniker": "E:\\NewRepos\\Trans2\\tst.txt",
               "RelativeDocumentMoniker": "tst.txt",
               "ToolTip": "E:\\NewRepos\\Trans2\\tst.txt",
               "RelativeToolTip": "tst.txt",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAADkAAAAAAAAA",
+              "ViewState": "AQIAAB8AAAAAAAAAAAAowDwAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
               "WhenOpened": "2024-03-06T00:03:43.569Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Parser.Tokens.cs",
               "DocumentMoniker": "E:\\NewRepos\\Trans2\\Parser.Tokens.cs",
               "RelativeDocumentMoniker": "Parser.Tokens.cs",
@@ -128,21 +128,19 @@
               "RelativeToolTip": "Parser.Tokens.cs",
               "ViewState": "AQIAADwAAAAAAAAAAAAAABAAAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-03T14:06:52.703Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-03T14:06:52.703Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 2,
               "Title": "Form1.cs",
               "DocumentMoniker": "E:\\NewRepos\\Trans2\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "E:\\NewRepos\\Trans2\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AQIAADYAAAAAAAAAAAAmwE0AAAAMAAAA",
+              "ViewState": "AQIAAD8AAAAAAAAAAAAmwE0AAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-02-29T20:24:17.551Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-02-29T20:24:17.551Z"
             },
             {
               "$type": "Document",
@@ -154,8 +152,7 @@
               "RelativeToolTip": "Parser.Grammars.cs",
               "ViewState": "AQIAAGIBAAAAAAAAAAAAAGIBAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-03T01:50:02.088Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-03T01:50:02.088Z"
             },
             {
               "$type": "Document",
@@ -167,8 +164,7 @@
               "RelativeToolTip": "Parser.cs",
               "ViewState": "AQIAAGQAAAAAAAAAAAAmwHMAAAAGAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-02-29T20:26:30.928Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-02-29T20:26:30.928Z"
             },
             {
               "$type": "Document",
@@ -178,30 +174,27 @@
               "ToolTip": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\ae2d2828b4ea33535813de44457ab6595d63d54db3d408ad2e72ef39ded91907\\src\\libraries\\System.Private.CoreLib\\src\\System\\String.Manipulation.cs",
               "ViewState": "AQIAAMIAAAAAAAAAAAAmwNwAAAAMAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-19T15:03:16.997Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-19T15:03:16.997Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Enumerable.cs",
-              "DocumentMoniker": "C:\\Users\\HP\\AppData\\Local\\Temp\\.vsdbgsrc\\cb615b6b39ce7f56206f1a889a3947e49b935375a5497fd7d8c642df55c60776\\Enumerable.cs",
-              "ToolTip": "C:\\Users\\HP\\AppData\\Local\\Temp\\.vsdbgsrc\\cb615b6b39ce7f56206f1a889a3947e49b935375a5497fd7d8c642df55c60776\\Enumerable.cs [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]",
-              "ViewState": "AQIAAFcRAAAAAAAAAAAmwGURAAACAAAA",
+              "Title": "List.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\4ad5c695d1991d4ee397b8edf7c9b2bd1c555b347b1419b909af31a5b50812cd\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\List.cs",
+              "ToolTip": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\4ad5c695d1991d4ee397b8edf7c9b2bd1c555b347b1419b909af31a5b50812cd\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\List.cs",
+              "ViewState": "AQIAABYAAAAAAAAAAAAmwCcAAAAIAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-29T02:25:57.078Z",
-              "EditorCaption": " [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]"
+              "WhenOpened": "2024-03-04T08:30:55.037Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "List.cs",
-              "DocumentMoniker": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\4ad5c695d1991d4ee397b8edf7c9b2bd1c555b347b1419b909af31a5b50812cd\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\List.cs",
-              "ToolTip": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\4ad5c695d1991d4ee397b8edf7c9b2bd1c555b347b1419b909af31a5b50812cd\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\List.cs",
-              "ViewState": "AQIAAGkCAAAAAAAAAAAEwHYCAAAMAAAA",
+              "Title": "Dictionary.cs",
+              "DocumentMoniker": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\35d53eefb2dd5b8c2546b6d99c92b25c9c21958c68506f9661bd2584160a55e4\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\Dictionary.cs",
+              "ToolTip": "C:\\Users\\HP\\AppData\\Local\\SourceServer\\35d53eefb2dd5b8c2546b6d99c92b25c9c21958c68506f9661bd2584160a55e4\\src\\libraries\\System.Private.CoreLib\\src\\System\\Collections\\Generic\\Dictionary.cs",
+              "ViewState": "AQIAAJoAAAAAAAAAAAAmwKgAAAA5AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-04T08:30:55.037Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-29T12:07:49.303Z"
             },
             {
               "$type": "Document",
@@ -247,8 +240,7 @@
               "RelativeToolTip": "Form1.Designer.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-20T10:16:42.301Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-20T10:16:42.301Z"
             },
             {
               "$type": "Document",
@@ -269,8 +261,7 @@
               "ToolTip": "E:\\NewRepos\\Trans2\\Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435]",
               "RelativeToolTip": "Form1.cs [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-03T13:58:15.67Z",
-              "EditorCaption": " [\u041A\u043E\u043D\u0441\u0442\u0440\u0443\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435]"
+              "WhenOpened": "2024-03-03T13:58:15.67Z"
             },
             {
               "$type": "Document",
@@ -281,8 +272,7 @@
               "ToolTip": "E:\\NewRepos\\Trans2\\Form1.resx",
               "RelativeToolTip": "Form1.resx",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
-              "WhenOpened": "2024-03-19T18:58:28.547Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-03-19T18:58:28.547Z"
             },
             {
               "$type": "Document",
