@@ -35,10 +35,8 @@
             Value = new DataGridViewTextBoxColumn();
             treeView1 = new TreeView();
             comboBox1 = new ComboBox();
-            dataGridView2 = new DataGridView();
-            Error = new DataGridViewTextBoxColumn();
+            treeView2 = new TreeView();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             SuspendLayout();
             // 
             // richTextBox1
@@ -52,6 +50,7 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.AllowUserToAddRows = false;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.Columns.AddRange(new DataGridViewColumn[] { Id, TokenType, Value });
             dataGridView1.Location = new Point(1042, 24);
@@ -59,7 +58,6 @@
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.Size = new Size(775, 829);
             dataGridView1.TabIndex = 1;
-            dataGridView1.AllowUserToAddRows = false;
             // 
             // Id
             // 
@@ -106,33 +104,20 @@
             comboBox1.TabIndex = 4;
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
-            // dataGridView2
+            // treeView2
             // 
-            dataGridView2.AllowUserToAddRows = false;
-            dataGridView2.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView2.Columns.AddRange(new DataGridViewColumn[] { Error });
-            dataGridView2.Location = new Point(1042, 24);
-            dataGridView2.Name = "dataGridView2";
-            dataGridView2.RowHeadersWidth = 51;
-            dataGridView2.Size = new Size(775, 829);
-            dataGridView2.TabIndex = 5;
-            dataGridView2.Visible = false;
-            // 
-            // Error
-            // 
-            Error.Frozen = true;
-            Error.HeaderText = "Error";
-            Error.MinimumWidth = 6;
-            Error.Name = "Error";
-            Error.ReadOnly = true;
-            Error.Width = 700;
+            treeView2.Location = new Point(1042, 24);
+            treeView2.Name = "treeView2";
+            treeView2.Size = new Size(775, 829);
+            treeView2.TabIndex = 5;
+            treeView2.Visible = false;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1829, 938);
-            Controls.Add(dataGridView2);
+            Controls.Add(treeView2);
             Controls.Add(comboBox1);
             Controls.Add(treeView1);
             Controls.Add(dataGridView1);
@@ -140,7 +125,6 @@
             Name = "Form1";
             Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dataGridView2).EndInit();
             ResumeLayout(false);
         }
 
@@ -153,7 +137,6 @@
         private DataGridViewTextBoxColumn Value;
         private TreeView treeView1;
         private ComboBox comboBox1;
-        private DataGridView dataGridView2;
-        private DataGridViewTextBoxColumn Error;
+        private TreeView treeView2;
     }
 }

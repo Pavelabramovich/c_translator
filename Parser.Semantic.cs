@@ -337,6 +337,11 @@ public static partial class Parser
                             throw new SemanticException("Invalid return type of function.");
                     }
                 }
+                else if (@operator == "Label")
+                {
+                    // Already checked.
+                    return;
+                }
                 else
                 {
                     try
@@ -503,16 +508,19 @@ public static partial class Parser
                 Node var = assignmentNode.Children.ToArray()[0];
                 Node expr = assignmentNode.Children.ToArray()[1];
 
-                var token = ((ValueNode)var).Token;
+                //var token = ((ValueNode)var).Token;
+                var leftTypeInfo = GetLValueType(var, scope);
 
-                if (!scope.AncestorsIdentifiers.TryGetValue(token.Id, out IdentifierInfo? info))               
-                    throw new SemanticException($"Variable {token.Value} is no defined.");
+                if (leftTypeInfo.IsReadOnly)
+                    throw new SemanticException("Lvalue is read only.");
+
+                //if (!scope.AncestorsIdentifiers.TryGetValue(token.Id, out IdentifierInfo? info))               
+                //    throw new SemanticException($"Variable {token.Value} is no defined.");
                 
-                if (info is FuncInfo)
-                    throw new SemanticException($"Variable {token.Value} is function that not assigneble.");
+                //if (info is FuncInfo)
+                //    throw new SemanticException($"Variable is function that not assigneble.");
 
-                if (info.Type.IsReadOnly)
-                    throw new SemanticException($"Variable {token.Value} is read only.");
+
 
                 var type1 = GetRValueType(var, scope);
                 var type2 = GetRValueType(expr, scope);

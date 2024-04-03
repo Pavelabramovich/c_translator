@@ -23,7 +23,7 @@ public partial class Form1 : Form
         {
             ["Lexical analysis"] = dataGridView1,
             ["Syntax analysis"] = treeView1,
-            ["Semantic analysis"] = dataGridView2
+            ["Semantic analysis"] = treeView2
         };
     }
 
@@ -43,7 +43,7 @@ public partial class Form1 : Form
         {
             SetTableError(ex);
             SetTreeError(ex);
-            UpdateSemanticTable(ex.Message);
+            SetSemanticError(ex);
             return;
         }
 
@@ -60,7 +60,7 @@ public partial class Form1 : Form
             catch (SyntaxException ex)
             {
                 SetTreeError(ex);
-                UpdateSemanticTable(ex.Message);
+                SetSemanticError(ex);
 
                 return;
             }
@@ -73,11 +73,12 @@ public partial class Form1 : Form
             try
             {
                 Parser.SemanticAnalysis(root);
-                UpdateSemanticTable("Semantic is valid");
+
+                UpdateSemanticTree(root);
             }
             catch (SemanticException ex)
             {
-                UpdateSemanticTable(ex.Message);
+                SetSemanticError(ex);
             }
         }
     }
@@ -160,12 +161,59 @@ public partial class Form1 : Form
         treeView1.Nodes.Add(ex.Message);
     }
 
-    private void UpdateSemanticTable(string value)
+    private void UpdateSemanticTree(Node root)
     {
-        if (dataGridView2.Rows.Count == 0)
-            dataGridView2.Rows.Add();
+        treeView2.Nodes.Clear();
 
-        dataGridView2.Rows[0].Cells[0].Value = value;
+        if (ToViewNode(root) is TreeNode treeNodeRoot)
+            treeView2.Nodes.Add(treeNodeRoot);
+
+        treeView2.ExpandAll();
+
+
+        static TreeNode? ToViewNode(Node node)
+        {
+            if (node is EmptyNode)
+            {
+                return null;
+            }
+            if (node is ValueNode tokenNode)
+            {
+                TreeNode treeNode = new TreeNode(tokenNode.Token.Value);
+                return treeNode;
+            }
+            else if (node is OperatorNode operatorNode)
+            {
+                if (operatorNode.Operator is "(..)" or "Line ;")
+                {
+                    return ToViewNode(operatorNode.Children.ToArray()[0]);
+                }
+
+                TreeNode treeNode = new TreeNode(operatorNode.Operator);
+
+                foreach (var child in operatorNode.Children)
+                {
+                    if (ToViewNode(child) is TreeNode treeNodeChild)
+                        treeNode.Nodes.Add(treeNodeChild);
+                }
+
+                return treeNode;
+            }
+            else if (node is TypesNode typesNode)
+            {
+                return new TreeNode(string.Join(' ', typesNode.Types.Select(t => t.Value)));
+            }
+            else
+            {
+                throw new Exception("???");
+            }
+        }
+    }
+
+    private void SetSemanticError(Exception ex)
+    {
+        treeView2.Nodes.Clear();
+        treeView2.Nodes.Add(ex.Message);
     }
 
 

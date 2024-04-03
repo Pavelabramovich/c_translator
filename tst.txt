@@ -54,7 +54,3 @@ int main()
 	while (12)
 		break;
 }
-
-
-
-
