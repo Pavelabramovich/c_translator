@@ -23,13 +23,15 @@ public partial class Form1 : Form
         {
             ["Lexical analysis"] = dataGridView1,
             ["Syntax analysis"] = treeView1,
-            ["Semantic analysis"] = treeView2
+            ["Semantic analysis"] = treeView2,
+            ["Interpretation"] = richTextBox2
         };
     }
 
     private void richTextBox1_TextChanged(object sender, EventArgs e)
     {
         string text = richTextBox1.Text;
+        string currentChoice = comboBox1.SelectedItem?.ToString() ?? string.Empty;
 
         IEnumerable<Token> tokens;
 
@@ -44,12 +46,13 @@ public partial class Form1 : Form
             SetTableError(ex);
             SetTreeError(ex);
             SetSemanticError(ex);
+            SetInterpretationError(ex); 
             return;
         }
 
         Node root;
 
-        if (comboBox1.SelectedItem?.ToString() == "Syntax analysis" || comboBox1.SelectedItem?.ToString() == "Semantic analysis")
+        if (currentChoice is "Syntax analysis" or "Semantic analysis" or "Interpretation")
         {
             try
             {
@@ -61,14 +64,14 @@ public partial class Form1 : Form
             {
                 SetTreeError(ex);
                 SetSemanticError(ex);
-
+                SetInterpretationError(ex);
                 return;
             }
         }
         else return;
 
-        
-        if (comboBox1.SelectedItem?.ToString() == "Semantic analysis")
+
+        if (currentChoice is "Semantic analysis" or "Interpretation")
         {
             try
             {
@@ -79,8 +82,29 @@ public partial class Form1 : Form
             catch (SemanticException ex)
             {
                 SetSemanticError(ex);
+                SetInterpretationError(ex);
+                return;
             }
         }
+        else return;
+
+        if (currentChoice == "Interpretation")
+        {
+            try
+            {
+                StringWriter console = new();
+
+                Parser.Interpret(root, console);
+
+                richTextBox2.Text = console.ToString();
+            }
+            catch (Exception ex)
+            {
+                SetInterpretationError(ex);
+                return;
+            }
+        }
+        else return;
     }
 
     private void UpdateTable(List<Token> tokens)
@@ -214,6 +238,12 @@ public partial class Form1 : Form
     {
         treeView2.Nodes.Clear();
         treeView2.Nodes.Add(ex.Message);
+    }
+
+
+    private void SetInterpretationError(Exception ex)
+    {
+        richTextBox2.Text = ex.Message;
     }
 
 

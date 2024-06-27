@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Trans2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e65749063e9ac87f017d2559dd0584819ba0406")]
 [assembly: System.Reflection.AssemblyProductAttribute("Trans2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Trans2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

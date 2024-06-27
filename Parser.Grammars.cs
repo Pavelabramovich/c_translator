@@ -424,7 +424,8 @@ public static partial class Parser
                     | FunctionPrototypeGrammar
                     | VariableCreatingGrammar
                         .Then(new TokenGrammar(TokenType.Punctuator, ";")).WithError("; missed after variable creating.")
-                        .AsNode(nodes => nodes[0]),
+                        .AsNode(nodes => nodes[0])
+                    | new TokenGrammar(TokenType.PreprocessorDirective),
                     "Program",
                     separator: null,
                     canEmpty: true);
@@ -819,7 +820,8 @@ public static partial class Parser
         {
             return 
                 new BinaryOperatorGrammar(LValueGrammar, GGrammar, TokenGrammar.Any(TokenType.Punctuator, "=", "+=", "-=", "*=", "/=", "%=", "&=", "^=", "|="))
-                | GGrammar;
+                | GGrammar
+                | new BlockGrammar("{", "}", new ListGrammar(ExpressionGrammar, "Init values", canEmpty: false));
         });
 
         public static LazyGrammar GGrammar => new(() =>
@@ -869,9 +871,9 @@ public static partial class Parser
                 | new PreUnaryOperatorGrammar(LValueGrammar, "--", "Predecrement --")
                 | new PreUnaryOperatorGrammar(BGrammar, "-", "Negation -")
                 | new PreUnaryOperatorGrammar(BGrammar, "+", "Plus +")
+                | new PreUnaryOperatorGrammar(ExpressionGrammar, "*", "Indirection *")
                 | new PreUnaryOperatorGrammar(BGrammar, "!", "Logical not !")
-                | new PreUnaryOperatorGrammar(BGrammar, "~", "Bitwise complement ~")
-                | new PreUnaryOperatorGrammar(BGrammar, "*", "Indirection *")
+                | new PreUnaryOperatorGrammar(BGrammar, "~", "Bitwise complement ~")              
                 | new PreUnaryOperatorGrammar(BGrammar, "&", "Address-of &")
                 | new TokenGrammar(TokenType.KeyWord, "sizeof")
                     .Then(new TokenGrammar(TokenType.Punctuator, "(")).WithError("Invalid sizeof operator: '(' is missed.")
@@ -914,7 +916,7 @@ public static partial class Parser
                 MemberedGrammar
                     .ThenNested(
                         new TokenGrammar(TokenType.Punctuator, "[")
-                            .Then(ExpressionGrammar)
+                            .Then(DGrammar)
                             .Then(new TokenGrammar(TokenType.Punctuator, "]"))
                             .AsNode(nodes => new UnaryOperatorNode(nodes[1], "Indexer [..]"))
                         | new TokenGrammar(TokenType.Punctuator, ".")
@@ -925,7 +927,7 @@ public static partial class Parser
                             .AsNode(nodes => new UnaryOperatorNode(nodes[1], "Member access ->")),
                          merge: (l, r) => new BinaryOperatorNode(l, ((UnaryOperatorNode)r).Child, ((UnaryOperatorNode)r).Operator))
                 | IdentifierGrammar;
-        });
+        }); 
 
 
         public static LazyGrammar MemberedGrammar => new(() =>
@@ -937,7 +939,7 @@ public static partial class Parser
         public static LazyGrammar TypeGrammar => new(() =>
         {
             return
-                (StructType | new TokenGrammar(TokenType.Type) | new TokenGrammar(TokenType.Punctuator, "*"))
+                (StructType | new TokenGrammar(TokenType.Type))
                     .ThenNested(StructType | new TokenGrammar(TokenType.Type) | new TokenGrammar(TokenType.Punctuator, "*"),
                     merge: (node1, node2) =>
                     {
@@ -992,7 +994,7 @@ public static partial class Parser
     public class ValueNode : Node
     {
         public Token Token { get; init; }
-
+        public TypeInfo? TypeInfo { get; set; }
 
         public ValueNode(Token token)
         {
@@ -1008,6 +1010,8 @@ public static partial class Parser
         {
             Types = new(types);
         }
+
+        public TypeInfo TypeInfo { get; set; }
     }
 
     public sealed class EmptyNode : Node

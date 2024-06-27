@@ -14,3 +14,4 @@ E:\NewRepos\Trans2\obj\Debug\net8.0-windows\refint\Trans2.dll
 E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.pdb
 E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.genruntimeconfig.cache
 E:\NewRepos\Trans2\obj\Debug\net8.0-windows\ref\Trans2.dll
+E:\NewRepos\Trans2\obj\Debug\net8.0-windows\Trans2.sourcelink.json

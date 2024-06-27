@@ -1,56 +1,30 @@
-struct A
-{
-	int a;
-};
+#include "iostream"
 
-struct B
-{
-	struct A * a;
-};
+int main() {
+    
+   int numbers[3][3] = {{1,2,3}, {3,4,5}, {5,4,5}};
+    int num[3][3] = {{10,2,3}, {13,14,5}, {5,44,5}};
 
-int func(int* d, double a)
-{
-	return 0;
-}
+   int sum1 = numbers[0][0] + numbers[1][1] + numbers[2][2];
+   int sum2 = num[0][0] + num[1][1] + num[2][2];
+   	
+    if (sum1 <= sum2) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                numbers[i][j] += num[i][j];
+            }
+        }
+    } else {
+        numbers[0][0] = 1;
 
-int main()
-{
-	struct B b;
+    }
 
-	int a = b.a->a;
-	int* ptr = &a;
-	
-	int i;
-	i = *ptr;
+     for (int i = 0; i < 3; i++) {
+         for (int j = 0; j < 3; j++) {
+             printf(numbers[i][j]);
+         }
+     } 
 
-	int i = 3;
 
-	int res = func(ptr, 10 + 12 / 2 / 3 / 4 + 3 /3);
-	int d, o = (7 + 1) * 5, m = (int)8.3;
-
-	if (d)
-	{
-		int i = 8;
-		long int * t = ptr;
-	}
-	else if (2)
-	{
-		return 0;
-	}
-	else if (2)
-	{
-		return 0;
-	}
-	else
-	{
-		o = 0;	
-	}
-
-	for (int d = 0; d < 10; d++)
-	{
-		d++;
-	}
-
-	while (12)
-		break;
+    return 0;
 }

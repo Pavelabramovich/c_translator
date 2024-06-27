@@ -36,6 +36,7 @@
             treeView1 = new TreeView();
             comboBox1 = new ComboBox();
             treeView2 = new TreeView();
+            richTextBox2 = new RichTextBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -97,7 +98,7 @@
             // comboBox1
             // 
             comboBox1.FormattingEnabled = true;
-            comboBox1.Items.AddRange(new object[] { "Lexical analysis", "Syntax analysis", "Semantic analysis" });
+            comboBox1.Items.AddRange(new object[] { "Lexical analysis", "Syntax analysis", "Semantic analysis", "Interpretation" });
             comboBox1.Location = new Point(800, 880);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(222, 28);
@@ -112,11 +113,21 @@
             treeView2.TabIndex = 5;
             treeView2.Visible = false;
             // 
+            // richTextBox2
+            // 
+            richTextBox2.Location = new Point(1042, 24);
+            richTextBox2.Name = "richTextBox2";
+            richTextBox2.Size = new Size(775, 829);
+            richTextBox2.TabIndex = 6;
+            richTextBox2.Text = "";
+            richTextBox2.Visible = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1829, 938);
+            Controls.Add(richTextBox2);
             Controls.Add(treeView2);
             Controls.Add(comboBox1);
             Controls.Add(treeView1);
@@ -138,5 +149,6 @@
         private TreeView treeView1;
         private ComboBox comboBox1;
         private TreeView treeView2;
+        private RichTextBox richTextBox2;
     }
 }
